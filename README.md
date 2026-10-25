@@ -18,20 +18,20 @@
 
 ## 📌 Overview
 
-Offline remote-desktop server configuration auditor — xrdp / sesman / TigerVNC / x11vnc / TightVNC
+
+OXrdpX is an offline, read-only xrdp and RDP server configuration auditor that parses xrdp.ini, sesman.ini and related files with stdlib-only parsers. It evaluates transport encryption (TLS vs legacy RDP security), certificate and key settings, authentication and session policy, and exposed listener addresses. Secrets are masked, findings are mapped to CWE and MITRE ATT&CK, and reports export to TXT, Markdown, JSON, CSV or SARIF.
 
 ---
 
 ## ✨ Features
 
-- Stdlib INI parser for xrdp.ini / sesman.ini with line tracking, duplicates and typo detection
-- xrdp — security_layer, crypt_level, TLS certificate & key analysis (DER parser: expiry, key size, sig alg, self-signed), ssl_protocols, tls_ciphers, channels, hard-coded session credentials, VNC back-end pivots
-- sesman — AllowRootLogin, MaxLoginRetry, group gating, alternate shells, clipboard restriction, idle limits, Xorg/Xvnc params, SessionVariables, FUSE umask
-- VNC — TigerVNC config (key=value & legacy perl), service / script / x11vncrc argument parsing, SecurityTypes, localhost, blacklist lockout, -nopw, -passwd, -unixpw, hook commands, websockify / noVNC, xstartup
-- VNC password files decrypted offline (stdlib DES) and checked for blank / weak / reused view-only passwords
-- Secrets masked everywhere; --root discovery; CWE + MITRE
-- Export TXT / Markdown / JSON / CSV / SARIF 2.1.0
-- Self-test --demo, CI gates --fail-on / --min-severity
+
+- Parsers for xrdp.ini and sesman.ini (security layer, crypt level, listener, session directives)
+- Transport checks: security_layer/negotiate vs rdp, tls_ciphers, min TLS version and legacy RDP security
+- Certificate and key review (certificate/key_file presence and file permissions)
+- Authentication/session policy: AllowRootLogin, MaxLoginRetry, idle/disconnect timeouts
+- Listener exposure (0.0.0.0 bind, port) and Fork/session-isolation settings
+- Secrets masked, CWE+ATT&CK mapping and TXT/MD/JSON/CSV/SARIF export with --fail-on gating
 
 ---
 
@@ -44,8 +44,13 @@ Offline remote-desktop server configuration auditor — xrdp / sesman / TigerVNC
 
 ## 🚀 Usage
 
+
 ```bash
-./OXrdpX
+./OXrdpX --scan -f sarif -o xrdp.sarif
+./OXrdpX --xrdp /etc/xrdp/xrdp.ini --sesman /etc/xrdp/sesman.ini
+./OXrdpX -r /mnt/image --fail-on high --json
+./OXrdpX --demo
+./OXrdpX --help
 ```
 
 ---
